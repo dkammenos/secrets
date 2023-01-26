@@ -9,40 +9,23 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static("public"));
 
-app.get("/login",(req, res)=> {
+app.get("/",(req, res)=> {
 
-  const day = date.getDate();
   
     //res.render("list", {listTitle: day, newListItems: defautItems});
-    res.render("list", {listTitle: day, newListItems: workItems});
+    //res.render("list", {listTitle: day, newListItems: workItems});
+    res.render("home");
   
   });
 
-  app.get("/register",(req, res)=> {
-
-    const day = date.getDate();
-    
-      //res.render("list", {listTitle: day, newListItems: defautItems});
-      res.render("list", {listTitle: day, newListItems: workItems});
-    
-    });
-    app.get("/secrets",(req, res)=> {
-
-      const day = date.getDate();
-      
-        //res.render("list", {listTitle: day, newListItems: defautItems});
-        res.render("list", {listTitle: day, newListItems: workItems});
-      
-      });
-      app.get("/submit",(req, res)=> {
-
-        const day = date.getDate();
-        
-          //res.render("list", {listTitle: day, newListItems: defautItems});
-          res.render("list", {listTitle: day, newListItems: workItems});
-        
-        });
-            
+  app.get("/login",(req, res)=> {
+    res.render("login");
+  
+  });
+app.get("/register",(req, res)=> {
+  res.render("register");
+  
+  });
 
 
 app.listen(process.env.PORT || 3000, () => {

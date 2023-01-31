@@ -48,6 +48,10 @@ app.get("/register",(req, res)=> {
   res.render("register");
   
   });
+  app.get("/logout",(req, res)=> {
+    res.render("home");
+    
+    });
 
   app.post("/register",(req, res)=> {
     const newUser = new User({

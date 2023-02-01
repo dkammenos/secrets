@@ -4,7 +4,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
-const encrypt = require("mongoose-encryption")
+//const encrypt = require("mongoose-encryption")
+const md5 = require("md5");
 
 const app = express();
 
@@ -26,7 +27,7 @@ const userSchema = new mongoose.Schema( {
 
 secret=process.env.SECRET;
 
-userSchema.plugin(encrypt,{secret:secret, encryptedFields:["password"]});
+//userSchema.plugin(encrypt,{secret:secret, encryptedFields:["password"]});
 
 const User = mongoose.model("User",userSchema);
 
@@ -56,7 +57,7 @@ app.get("/register",(req, res)=> {
   app.post("/register",(req, res)=> {
     const newUser = new User({
       email:req.body.username,
-      password: req.body.password
+      password: md5(req.body.password)
       });
         newUser.save((err)=> {
           if (err) {
@@ -69,7 +70,7 @@ app.get("/register",(req, res)=> {
 
     app.post("/login",(req, res)=> {
       username = req.body.username;
-      password = req.body.password;
+      password = md5(req.body.password);
       User.findOne({email:username}, function (err, foundUser){
         if (err) {
           console.log("lathos");

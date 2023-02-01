@@ -4,8 +4,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
-//const encrypt = require("mongoose-encryption")
-const md5 = require("md5");
+//const encrypt = require("mongoose-encryption" Level)
+//const md5 = require("md5" Lever 3);
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const app = express();
 
@@ -54,33 +56,46 @@ app.get("/register",(req, res)=> {
     
     });
 
+    //password: md5(req.body.password)
   app.post("/register",(req, res)=> {
-    const newUser = new User({
-      email:req.body.username,
-      password: md5(req.body.password)
-      });
-        newUser.save((err)=> {
-          if (err) {
-            console.log(err)
-          } else {
-            res.render("secrets");
-          }
-          });    
+    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+      const newUser = new User({
+        email:req.body.username,
+        password: hash
+        });
+          newUser.save((err)=> {
+            if (err) {
+              console.log(err)
+            } else {
+              res.render("secrets");
+            }
+            });    
+      // Store hash in your password DB.
+  });
+
+   
     });
 
     app.post("/login",(req, res)=> {
       username = req.body.username;
-      password = md5(req.body.password);
+      //password = md5(req.body.password);
+      password = req.body.password;
       User.findOne({email:username}, function (err, foundUser){
         if (err) {
           console.log("lathos");
           res.render("home")
         }else {
           if(foundUser) {
-            if (foundUser.password=== password) {
-              console.log(password);
-              res.render("secrets")
-            }
+            bcrypt.compare(password,foundUser.password, function(err, result) {
+              if (result == true) {
+                console.log(password);
+                res.render("secrets")
+              }
+            
+              
+              // result == false
+          });
+           
           }
         }
       });

@@ -12,7 +12,10 @@ const mongoose = require('mongoose');
 //Level 5 - Session & Cookies
 const session = require('express-session');
 const passport = require("passport");
-const passportLocalMongoose = require("passport-local-mongoose")
+const passportLocalMongoose = require("passport-local-mongoose");
+//Level 6 - oAuth Google
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const findOrCreate = require('mongoose-findorcreate')
 
 const app = express();
 
@@ -40,6 +43,7 @@ const userSchema = new mongoose.Schema( {
     password:String
 });
 userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(findOrCreate);
 
 
 secret=process.env.SECRET;
@@ -50,6 +54,18 @@ const User = mongoose.model("User",userSchema);
 passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser()); 
 passport.deserializeUser(User.deserializeUser());
+//Google oAuth code
+passport.use(new GoogleStrategy({
+  clientID: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  callbackURL: "http://localhost:3000/auth/google/secrets"
+},
+function(accessToken, refreshToken, profile, cb) {
+  User.findOrCreate({ googleId: profile.id }, function (err, user) {
+    return cb(err, user);
+  });
+}
+));
 
 
 app.get("/",(req, res)=> {
@@ -69,6 +85,8 @@ app.get("/",(req, res)=> {
 
 
 app.get("/register",(req, res)=> {
+  res.render("register");
+
   
   });
   app.get('/logout', function(req, res, next) {
